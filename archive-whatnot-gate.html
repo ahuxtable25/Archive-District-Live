@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Archive District · Live Drop</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;0,900;1,300&family=Barlow:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: #1A2845;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Rug texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      repeating-linear-gradient(
+        45deg,
+        rgba(196,168,130,0.04) 0px, rgba(196,168,130,0.04) 1px,
+        transparent 1px, transparent 14px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(196,168,130,0.03) 0px, rgba(196,168,130,0.03) 1px,
+        transparent 1px, transparent 14px
+      );
+    pointer-events: none;
+  }
+
+  /* Animated red top bar */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: #C41E3A;
+  }
+
+  .card {
+    background: #F8F5F0;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    animation: riseUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  @keyframes riseUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Rug strip top of card */
+  .rug-top {
+    height: 10px;
+    background: repeating-linear-gradient(
+      90deg,
+      #1A2845 0px, #1A2845 8px,
+      #C41E3A 8px, #C41E3A 10px,
+      #B8966A 10px, #B8966A 14px,
+      #1A2845 14px, #1A2845 22px,
+      #F0EDD8 22px, #F0EDD8 24px,
+      #1A2845 24px, #1A2845 32px
+    );
+  }
+
+  .card-body { padding: 36px 40px 40px; }
+
+  /* Logo */
+  .logo {
+    display: inline-flex;
+    margin-bottom: 28px;
+  }
+  .logo-inner {
+    background: #F0EDD8;
+    border: 2px solid #1C1C1A;
+    border-radius: 5px;
+    padding: 4px 9px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    line-height: 1.05;
+  }
+  .logo-inner .top    { font-size: 11px; color: #1C1C1A; letter-spacing: 0.5px; display: block; }
+  .logo-inner .bottom { display: flex; align-items: flex-end; gap: 4px; }
+  .logo-inner .bottom span:first-child { font-size: 11px; color: #1C1C1A; letter-spacing: 0.5px; }
+  .logo-inner .since  { font-size: 5px; color: #C41E3A; font-weight: 700; line-height: 1.9; }
+
+  /* Live pulse */
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(196,30,58,0.1);
+    border: 1px solid rgba(196,30,58,0.3);
+    padding: 5px 12px;
+    margin-bottom: 16px;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #C41E3A;
+    animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .live-pill span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: #C41E3A;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 8vw, 58px);
+    color: #1C1C1A;
+    line-height: 0.88;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+  h1 em { color: #C41E3A; font-style: normal; }
+
+  .sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 15px;
+    color: #8A857A;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  /* Perks */
+  .perks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding: 18px;
+    background: #F3F0EA;
+    border-left: 3px solid #C41E3A;
+  }
+  .perk {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: #1C1C1A;
+    letter-spacing: 0.5px;
+  }
+  .perk span:first-child { font-size: 14px; }
+
+  /* Form */
+  .form-label {
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: #8A857A;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .form-row { display: flex; gap: 0; }
+
+  input[type="email"] {
+    flex: 1;
+    padding: 13px 16px;
+    border: 1.5px solid #E4DFD6;
+    border-right: none;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: #1C1C1A;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="email"]:focus { border-color: #1C1C1A; }
+  input[type="email"].error { border-color: #C41E3A; }
+  input[type="email"]::placeholder { color: #C4B9AA; }
+
+  .btn-join {
+    background: #C41E3A;
+    border: none;
+    color: #fff;
+    padding: 13px 22px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-join:hover { background: #1C1C1A; }
+  .btn-join:active { transform: scale(0.98); }
+  .btn-join:disabled { background: #8A857A; cursor: not-allowed; }
+
+  .error-msg {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    color: #C41E3A;
+    letter-spacing: 0.5px;
+    margin-top: 5px;
+    min-height: 14px;
+  }
+
+  .privacy {
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    color: #C4B9AA;
+    line-height: 1.5;
+    margin-top: 14px;
+  }
+
+  /* Success state */
+  .success {
+    text-align: center;
+    padding: 8px 0 4px;
+    animation: riseUp 0.4s ease both;
+  }
+  .success-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: #1C1C1A;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 22px;
+  }
+  .success h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #1C1C1A;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .success p {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 15px;
+    color: #8A857A;
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+  .btn-continue {
+    display: inline-block;
+    background: #1C1C1A;
+    color: #fff;
+    padding: 14px 36px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+    width: 100%;
+    text-align: center;
+  }
+  .btn-continue:hover { background: #C41E3A; }
+
+  /* Rug strip bottom of card */
+  .rug-bottom {
+    height: 10px;
+    background: repeating-linear-gradient(
+      90deg,
+      #1A2845 0px, #1A2845 8px,
+      #C41E3A 8px, #C41E3A 10px,
+      #B8966A 10px, #B8966A 14px,
+      #1A2845 14px, #1A2845 22px,
+      #F0EDD8 22px, #F0EDD8 24px,
+      #1A2845 24px, #1A2845 32px
+    );
+  }
+
+  .footer-note {
+    margin-top: 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    color: rgba(240,237,216,0.35);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="card">
+  <div class="rug-top"></div>
+
+  <div class="card-body">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-inner">
+        <span class="top">ARCHIVE</span>
+        <div class="bottom">
+          <span>DISTRICT</span>
+          <span class="since">SINCE<br/>2019</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Default: email capture form -->
+    <div id="form-view">
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        <span>LIVE NOW ON WHATNOT</span>
+      </div>
+
+      <h1>JOIN THE<br/>LIVE <em>DROP</em></h1>
+      <p class="sub">
+        Vintage and retro pieces going live right now — Kappa, Carhartt, Champion and more. Bid before they're gone.
+      </p>
+
+      <div class="perks">
+        <div class="perk"><span>⚡</span><span>Bid on pieces before they hit the shop</span></div>
+        <div class="perk"><span>💷</span><span>Starting bids from £10</span></div>
+        <div class="perk"><span>📦</span><span>Same day dispatch on all wins</span></div>
+        <div class="perk"><span>🔔</span><span>Get notified of future drops first</span></div>
+      </div>
+
+      <label class="form-label" for="email">YOUR EMAIL — GET NOTIFIED OF EVERY DROP</label>
+      <div class="form-row">
+        <input type="email" id="email" placeholder="your@email.com" autocomplete="email"/>
+        <button class="btn-join" onclick="handleJoin()">JOIN LIVE →</button>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+      <p class="privacy">No spam. Just drop alerts when we go live. Unsubscribe any time.</p>
+    </div>
+
+    <!-- Success: then redirect -->
+    <div id="success-view" class="success" style="display:none">
+      <div class="success-icon">✓</div>
+      <h2>YOU'RE IN.</h2>
+      <p>We've got your email — you'll be first to know when we drop. Now let's get you to the live...</p>
+      <button class="btn-continue" id="continue-btn" onclick="goToWhatnotNow()">
+        JOIN LIVE NOW →
+      </button>
+      <p class="privacy" style="margin-top:14px;">Redirecting in <span id="countdown">5</span>s...</p>
+    </div>
+
+  </div>
+
+  <div class="rug-bottom"></div>
+</div>
+
+<p class="footer-note">archivedistrict.com · London · Est. 2019</p>
+
+<script>
+  const WHATNOT_URL = "https://www.whatnot.com/s/jVKGl3NQ";
+
+  // Store collected emails (in production, POST to your backend / Mailchimp / etc)
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxnJ6JSkj9ceOXsGwJjS_YYo00k5hsAoRMbWElI6Ke17bmEpeNUbRUhQxzBXFHckBrtBQ/exec";
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
+  function handleJoin() {
+    const input = document.getElementById("email");
+    const errMsg = document.getElementById("error-msg");
+    const btn = document.querySelector(".btn-join");
+    const email = input.value.trim();
+
+    // Validate
+    if (!email) {
+      input.classList.add("error");
+      errMsg.textContent = "Please enter your email address.";
+      input.focus();
+      return;
+    }
+    if (!isValidEmail(email)) {
+      input.classList.add("error");
+      errMsg.textContent = "Please enter a valid email address.";
+      input.focus();
+      return;
+    }
+
+    input.classList.remove("error");
+    errMsg.textContent = "";
+    btn.disabled = true;
+    btn.textContent = "SAVING...";
+
+    // POST to Google Sheet
+    fetch(SHEET_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, source: "Whatnot Live Gate" })
+    })
+    .then(() => {
+      // no-cors means we can't read the response, but if no error it worked
+      showSuccess();
+    })
+    .catch(() => {
+      // Even on network quirks, still proceed — email attempt was made
+      showSuccess();
+    });
+  }
+
+  function showSuccess() {
+    document.getElementById("form-view").style.display = "none";
+    document.getElementById("success-view").style.display = "block";
+
+    // Countdown then redirect
+    let seconds = 5;
+    const cdEl = document.getElementById("countdown");
+    const timer = setInterval(() => {
+      seconds--;
+      if (cdEl) cdEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(timer);
+        goToWhatnotNow();
+      }
+    }, 1000);
+  }
+
+  function goToWhatnotNow() {
+    window.location.href = WHATNOT_URL;
+  }
+
+  // Allow Enter key to submit
+  document.getElementById("email").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") handleJoin();
+  });
+
+  // Clear error on type
+  document.getElementById("email").addEventListener("input", function() {
+    this.classList.remove("error");
+    document.getElementById("error-msg").textContent = "";
+  });
+</script>
+</body>
+</html>
